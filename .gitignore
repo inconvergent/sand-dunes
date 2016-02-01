@@ -1,0 +1,6 @@
+res/*
+*.swp
+*.*~
+*.pyc
+.ropeproject
+build
