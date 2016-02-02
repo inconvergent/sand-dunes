@@ -4,10 +4,11 @@
 from __future__ import print_function
 
 from itertools import product
-from numpy import arange
 
 SIZE = 512
 ONE = 1./SIZE
+
+LEAP = 100
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
@@ -15,13 +16,12 @@ FRONT = [0,0,0,5]
 
 def show(sand, render):
 
-  ## sorry, sorry sorry ...
-  # this v slow obviously. just getting things ready..
+  if sand.i % LEAP != 0:
+    return
 
   size = sand.size
   one = sand.one
   s = sand.get_normalized_sand()
-
 
   ctx = render.ctx
   set_rgb = ctx.set_source_rgb
