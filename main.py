@@ -3,72 +3,56 @@
 
 from __future__ import print_function
 
-from itertools import product
-
-SIZE = 512
+SIZE = 200
 ONE = 1./SIZE
 
-LEAP = 100
+LEAP = 20
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
 
 
-def show(sand, render):
-
-  if sand.i % LEAP != 0:
-    return
-
-  size = sand.size
-  one = sand.one
-  s = sand.get_normalized_sand()
-
-  ctx = render.ctx
-  set_rgb = ctx.set_source_rgb
-  rect = ctx.rectangle
-  fill = ctx.fill
-  for i,j in product(xrange(size), repeat=2):
-    set_rgb(*[s[i*size+j]]*3)
-    x = i*one
-    y = j*one
-    rect(i*one,j*one,x+one,y+one)
-    fill()
-
 def main():
 
-  import gtk
-  from render.render import Animate
+  from matplotlib import pyplot as plt
   from modules.sand import Sand
+  from time import sleep
 
   sand = Sand(SIZE)
 
-  def wrap(render):
+  # plt.ion()
+  # plt.figure()
+
+  # img = plt.imshow(
+    # sand.get_normalized_sand().reshape((SIZE,-1)),
+    # cmap='Greys',
+    # interpolation='nearest'
+  # )
+  # plt.show()
+
+  for i in xrange(1000000):
 
     sand.step()
-    show(sand, render)
 
-    return True
+    if sand.i % LEAP == 0:
 
-  render = Animate(SIZE, BACK, FRONT, wrap)
+      print(sand.i)
 
-  gtk.main()
+      # img.set_data(
+        # sand.get_normalized_sand().reshape((SIZE,-1))
+      # )
+      # sleep(0.00001)
 
+      plt.imshow(
+        sand.get_normalized_sand(dbg=True).reshape((SIZE,-1)),
+        cmap='Greys',
+        interpolation='nearest'
+      )
+      plt.show()
+      # plt.draw()
 
 
 if __name__ == '__main__':
-
-  if False:
-
-    import pyximport
-    pyximport.install()
-    import pstats, cProfile
-
-    fn = './profile/profile'
-    cProfile.runctx("main()", globals(), locals(), fn)
-    p = pstats.Stats(fn)
-    p.strip_dirs().sort_stats('cumulative').print_stats()
-
-  else:
 
     main()
 
