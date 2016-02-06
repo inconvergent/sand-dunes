@@ -71,16 +71,17 @@ class Sand(object):
 
   def __wind(self):
 
+    from numpy import ones
+
     size2 = self.size2
     size = self.size
-    inds = self.inds
+    curr = self.inds
     frame = self.frame
     s = self.s
     sb = self.sb
 
-    # a = self.a + (1.0-2*random(size=size2))
-    from numpy import ones
-    a = self.a*ones(size2)
+    a = self.a + (1.0-2*random(size=size2))*0.1
+    # a = self.a*ones(size2)
 
     i = round(cos(a))
     j = round(sin(a))
@@ -91,24 +92,21 @@ class Sand(object):
 
     ij = (i*size+j).astype('int')
 
-    upwind = self.inds + ij
-    # upwind[upwind<0] = 0
-    # upwind[upwind>size2-1] = size2-1
-    # diff = (s[upwind] - s[inds])*0.2
+    downwind = self.inds + ij
 
-    # print(inds.reshape(size,-1))
-    # print(ij.reshape(size,-1))
-    # print(upwind.reshape(size,-1))
-
-    # mask = random(size=size2)>s
-    # diff[mask] = 0.
+    # diff = s[downwind] - s[curr]
 
     sb = s[:]
-    s[inds] -= sb[upwind]*0.1
-    s[upwind] += sb[inds]*0.1
+    move = sb[curr]*0.1
+
+    mask = move>s[curr]
+    move[mask] = s[curr][mask]
+
+    s[curr] -= move
+    s[downwind] += move
 
     # s[inds] -= diff
-    # s[upwind] += diff
+    # s[downwind] += diff
     # s[frame] = 0.0
 
   def get_sand(self):
@@ -124,7 +122,9 @@ class Sand(object):
     res = (s-mi)/(ma-mi)
     if dbg:
       print('s', mi, ma)
-      # print(res.reshape((self.size,-1)))
+      print(res.reshape((self.size,-1)))
+
+    # print(res.reshape((self.size,-1)))
 
     return res
 
