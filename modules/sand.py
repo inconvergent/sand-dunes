@@ -4,135 +4,124 @@ from __future__ import print_function
 
 from numpy import pi
 from numpy.random import random
-from numpy import arange
 from numpy import cos
 from numpy import sin
-from numpy import round
+from numpy import array
 from numpy import zeros
-from numpy import abs
+from numpy import logical_or
+from numpy.linalg import norm
 
 
 TWOPI = pi*2.0
 
 
+class Grain(object):
+
+  def __init__(self, sand, xy):
+    self.sand = sand
+    self.trail = [xy]
+
+    self.size = sand.size
+    self.stp = sand.stp
+    self.angle_stp = sand.angle_stp
+    self.one = sand.one
+
+  def get_pos(self):
+    return self.trail[-1]
+
+  def get_ind(self):
+    return (self.trail[-1]*self.size).astype('int').flatten()
+
+  def step(self):
+
+    size = self.size
+    xy = self.trail[-1]
+    dx = self.sand.dx
+
+    bx,by = (size*(xy-dx)).astype('int').flatten()
+    fx,fy = (size*(xy+dx)).astype('int').flatten()
+
+    slope = 0
+    sand = self.sand.sand
+
+    try:
+      slope = sand[fx,fy] - sand[bx,by]
+    except IndexError:
+      pass
+
+    if slope<0:
+      beta = 10.0*random()
+    else:
+      beta = random()
+
+    xy_new = xy+dx*(1.0+beta)
+
+    # print(norm(dx*size), norm(size*dx*(1.0+beta)))
+
+    if logical_or(xy_new>1.0, xy_new<0).any():
+      xy_new = random(size=(1,2))
+
+    self.trail.append(xy_new)
+    x,y = self.get_ind()
+    self.sand.sand[x,y] += 6
+
+    # TODO: if alive
+    return True
+
 
 class Sand(object):
 
-  def __init__(self, size, angle_stp=0.1):
-
+  def __init__(self, size, angle_stp=0.01):
     self.size = size
     self.size2 = size*size
     self.one = 1.0/size
     self.angle_stp = angle_stp
 
+    self.stp = self.one
+    # self.sand = random((size,size))*1
+    self.sand = random((size,size))*100
+    # self.sand = zeros((size,size), 'float')
+
+    self.grains = []
+
     self.a = 0.3*TWOPI
+    self.__set_direction()
     self.i = 1
 
-    self.__init_inds()
-    self.__init_frame()
-    self.__init_s('img')
-
-  def __init_inds(self):
-
-    size = self.size
-    size2 = self.size2
-    self.inds = arange(size2)
-    self.inds_2d = self.inds.reshape((size,-1))
-
-  def __init_frame(self):
-
-    size = self.size
-    size2 = self.size2
-    frame = zeros((size,size), 'float')
-    frame[0,:] = 1.
-    frame[size-1,:] = 1.
-    frame[:,size-1] = 1.
-    frame[:,0] = 1.
-    self.frame = frame.astype('bool').reshape((size2,-1)).flatten()
-
-  def __init_s(self, t='random'):
-
-    size = self.size
-    size2 = self.size2
-
-    if t == 'random':
-      self.s = random(size=self.size2)
-    elif t == 'img':
-      from utils import get_dens_from_img
-      # self.s = 1.0-get_dens_from_img('./img/x512.png').reshape((size2,-1)).flatten()
-      self.s = get_dens_from_img('./img/x1024.png').reshape((size2,-1)).flatten()
-    elif t == 'line':
-      self.s = zeros(self.size2, 'float').reshape((size,-1))
-      self.s[int(size/2.0),:] = 1.0
-      self.s = self.s.reshape((size2,-1)).flatten()
-
-    sb = zeros(self.s.shape,'float')
-    self.sb = sb
-    self.sb[:] = self.s[:]
-
-
-  def __wind(self):
-
-    from numpy import ones
-
-    size2 = self.size2
-    size = self.size
-    curr = self.inds
-    frame = self.frame
-    s = self.s
-    sb = self.sb
-
-    a = self.a + (1.0-2*random(size=size2))*self.angle_stp*0.8
-    a = self.a*ones(size2)
-
-    i = round(cos(a))
-    j = round(sin(a))
-
-    i[frame] = 0.0
-    j[frame] = 0.0
-
-    ij = (i*size+j).astype('int')
-
-    downwind = self.inds + ij
-
-    alpha = 0.01
-
-    diff = s[downwind] - s[curr]
-
-    beta = ones(size2)
-    beta[diff<0.0] = 3.0
-
-    sb[:] = alpha*beta*abs(diff)
-    s[curr] += -sb
-    s[downwind] += sb
+  def spawn(self, n=1):
+    xys = random(size=(n,2))
+    for xy in xys:
+      self.grains.append(Grain(self, xy))
 
   def get_sand(self):
-
     return self.s
 
+  def get_grains(self):
+    return self.grains
+
   def get_normalized_sand(self, dbg=False):
+    sand = self.sand
+    flat = sand.reshape((-1,1))
 
-    s = self.s
-    mi = s.min()
-    ma = s.max()
+    mi = flat.min()
+    ma = flat.max()
 
-    res = (s-mi)/(ma-mi)
     if dbg:
-      print('s', mi, ma)
-      print(res.reshape((self.size,-1)))
+      print(mi, ma)
 
-    # print(res.reshape((self.size,-1)))
+    return (sand[:,:]-mi)/(ma-mi)
 
-    return res
+  def __set_direction(self):
+    self.a += (1.0-2.0*random())*self.angle_stp
+    a = self.a
+    self.dx = array([cos(a), sin(a)], 'float')*self.stp
 
   def step(self):
-
     self.i += 1
+    self.__set_direction()
 
-    self.__wind()
+    for g in self.grains:
+      g.step()
 
-    self.a += (1.0-2.0*random())*self.angle_stp
-    # print('a', self.a)
-
-    return True
+    return len(self.grains)>0
 
