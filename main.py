@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-SIZE = 700
+SIZE = 1024
 ONE = 1./SIZE
 
 LEAP = 10
@@ -46,7 +46,7 @@ def main():
       print(sand.i)
 
       vals = sand.get_normalized_sand(dbg=False).reshape((SIZE,-1))
-      img.set_data(vals)
+      img.set_data(1.0-vals)
       tight_layout()
       draw()
 

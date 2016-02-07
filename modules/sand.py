@@ -9,6 +9,7 @@ from numpy import cos
 from numpy import sin
 from numpy import round
 from numpy import zeros
+from numpy import abs
 
 
 TWOPI = pi*2.0
@@ -17,7 +18,7 @@ TWOPI = pi*2.0
 
 class Sand(object):
 
-  def __init__(self, size, angle_stp=0.5):
+  def __init__(self, size, angle_stp=0.1):
 
     self.size = size
     self.size2 = size*size
@@ -29,7 +30,7 @@ class Sand(object):
 
     self.__init_inds()
     self.__init_frame()
-    self.__init_s('line')
+    self.__init_s('img')
 
   def __init_inds(self):
 
@@ -58,7 +59,8 @@ class Sand(object):
       self.s = random(size=self.size2)
     elif t == 'img':
       from utils import get_dens_from_img
-      self.s = 1.0-get_dens_from_img('./img/x512.png').reshape((size2,-1)).flatten()
+      # self.s = 1.0-get_dens_from_img('./img/x512.png').reshape((size2,-1)).flatten()
+      self.s = get_dens_from_img('./img/x1024.png').reshape((size2,-1)).flatten()
     elif t == 'line':
       self.s = zeros(self.size2, 'float').reshape((size,-1))
       self.s[int(size/2.0),:] = 1.0
@@ -80,8 +82,8 @@ class Sand(object):
     s = self.s
     sb = self.sb
 
-    a = self.a + (1.0-2*random(size=size2))*0.1
-    # a = self.a*ones(size2)
+    a = self.a + (1.0-2*random(size=size2))*self.angle_stp*0.8
+    a = self.a*ones(size2)
 
     i = round(cos(a))
     j = round(sin(a))
@@ -89,25 +91,20 @@ class Sand(object):
     i[frame] = 0.0
     j[frame] = 0.0
 
-
     ij = (i*size+j).astype('int')
 
     downwind = self.inds + ij
 
-    # diff = s[downwind] - s[curr]
+    alpha = 0.01
 
-    sb = s[:]
-    move = sb[curr]*0.1
+    diff = s[downwind] - s[curr]
 
-    mask = move>s[curr]
-    move[mask] = s[curr][mask]
+    beta = ones(size2)
+    beta[diff<0.0] = 3.0
 
-    s[curr] -= move
-    s[downwind] += move
-
-    # s[inds] -= diff
-    # s[downwind] += diff
-    # s[frame] = 0.0
+    sb[:] = alpha*beta*abs(diff)
+    s[curr] += -sb
+    s[downwind] += sb
 
   def get_sand(self):
 
