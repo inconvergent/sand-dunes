@@ -3,11 +3,11 @@
 
 from __future__ import print_function
 
-SIZE = 1024
-GRAINS = 1024
+SIZE = 400
+GRAINS = 4000
 ONE = 1./SIZE
 
-LEAP = 1
+LEAP = 100
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
@@ -53,12 +53,17 @@ def main():
       # clf()
       vals = sand.get_normalized_sand(dbg=True)
       img.set_data(vals)
+      # img = imshow(
+        # vals,
+        # cmap='Greys',
+        # interpolation='nearest'
+      # )
       # for g in sand.get_grains():
         # x,y = g.get_pos()
-        # plot(x, y, 'ro')
+        # plot(y*SIZE, x*SIZE, 'ro')
 
-      # xlim([0,1])
-      # ylim([0,1])
+      xlim([0,SIZE])
+      ylim([0,SIZE])
       tight_layout()
       draw()
 
