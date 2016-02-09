@@ -9,6 +9,8 @@ ONE = 1./SIZE
 
 LEAP = 500
 
+INC = 1.0
+
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
 
@@ -29,9 +31,7 @@ def main():
   from matplotlib.pyplot import imshow
 
 
-  sand = Sand(SIZE)
-
-  sand.spawn(GRAINS)
+  sand = Sand(SIZE, grains=GRAINS, angle_stp=0.01, inc=INC)
 
   figure(0)
   ion()
