@@ -9,6 +9,8 @@ from numpy import sin
 from numpy import array
 from numpy import zeros
 
+from scipy.ndimage.filters import gaussian_filter
+
 from numpy import logical_not
 from numpy import logical_and
 
@@ -30,7 +32,7 @@ class Sand(object):
     self.sand[:,:] = 50. + 20.*inc*random((size,size))
     self.xy = random(size=(grains,2))
 
-    self.a = 0.3*TWOPI
+    self.a = random()*TWOPI
     self.__set_direction()
     self.i = 1
 
@@ -84,8 +86,7 @@ class Sand(object):
     fij = (((size*(xy+dx))+size)%size).astype('int')
     bij = (((size*(xy-dx))+size)%size).astype('int')
 
-    res = sand[fij[:,0],fij[:,1]] - sand[bij[:,0],bij[:,1]]
-    return res
+    return sand[fij[:,0],fij[:,1]] - sand[bij[:,0],bij[:,1]]
 
   def step(self):
 
@@ -96,9 +97,17 @@ class Sand(object):
     slope = self.__get_slope()
 
     mask = logical_and(slope>0,random(self.grains)<0.7)
-    self.xy[mask,:] = (self.xy[mask,:]+self.dx*40.0+1)%1.0
+    self.xy[mask,:] = (self.xy[mask,:]+self.dx*50.0+1)%1.0
     self.__reselect(mask)
 
     xmask = logical_not(mask)
     self.xy[xmask,:] = (self.xy[xmask,:]+self.dx+1)%1.0
+
+    gaussian_filter(
+      self.sand,
+      0.2,
+      output=self.sand,
+      order=0,
+      mode='mirror'
+      )
 

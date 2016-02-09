@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-SIZE = 400
+SIZE = 900
 GRAINS = 1000
 ONE = 1./SIZE
 
@@ -29,9 +29,11 @@ def main():
   from matplotlib.pyplot import ylim
   from matplotlib.pyplot import tight_layout
   from matplotlib.pyplot import imshow
+  from matplotlib.pyplot import savefig
 
 
-  sand = Sand(SIZE, grains=GRAINS, angle_stp=0.01, inc=INC)
+
+  sand = Sand(SIZE, grains=GRAINS, angle_stp=0.005, inc=INC)
 
   figure(0)
   ion()
@@ -43,29 +45,33 @@ def main():
     interpolation='nearest'
   )
 
-  for i in xrange(1000000):
+  try:
+    for i in xrange(1000000):
 
-    sand.step()
+      sand.step()
 
-    if sand.i % LEAP == 0:
-      print(sand.i)
+      if sand.i % LEAP == 0:
+        print(sand.i)
 
-      # clf()
-      vals = sand.get_normalized_sand(dbg=True)
-      img.set_data(vals)
-      # img = imshow(
-        # vals,
-        # cmap='Greys',
-        # interpolation='nearest'
-      # )
-      # for g in sand.get_grains():
-        # x,y = g.get_pos()
-        # plot(y*SIZE, x*SIZE, 'ro')
+        # clf()
+        vals = sand.get_normalized_sand(dbg=True)
+        img.set_data(vals)
+        # img = imshow(
+          # vals,
+          # cmap='Greys',
+          # interpolation='nearest'
+        # )
+        # for g in sand.get_grains():
+          # x,y = g.get_pos()
+          # plot(y*SIZE, x*SIZE, 'ro')
 
-      xlim([0,SIZE])
-      ylim([0,SIZE])
-      tight_layout()
-      draw()
+        xlim([0,SIZE])
+        ylim([0,SIZE])
+        tight_layout()
+        draw()
+  except KeyboardInterrupt:
+    savefig('exit.png')
+    pass
 
 
 if __name__ == '__main__':
