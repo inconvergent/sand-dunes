@@ -8,8 +8,6 @@ from numpy import cos
 from numpy import sin
 from numpy import array
 from numpy import zeros
-from numpy import logical_or
-from numpy.linalg import norm
 
 
 TWOPI = pi*2.0
@@ -29,10 +27,10 @@ class Grain(object):
     self.one = sand.one
 
   def get_pos(self):
-    return self.trail.flatten()
+    return self.trail
 
   def get_ind(self):
-    return (self.trail*self.size).astype('int').flatten()
+    return (self.trail*self.size).astype('int')
 
   def reselect(self):
 
@@ -42,49 +40,30 @@ class Grain(object):
 
     while True:
       new_xy = random(2)
-      ni,nj = (size*new_xy).astype('int').flatten()
+      ni,nj = (size*new_xy).astype('int')
       if self.sand.sand[ni,nj]>=INC:
         self.trail = new_xy
         self.sand.sand[ni,nj] -= INC
         break
 
+  def _get_slope(self):
+    xy = self.trail
+    size = self.size
+    dx = self.sand.dx
+    fi,fj = (size*(xy+dx)).astype('int')
+    bi,bj = (size*(xy-dx)).astype('int')
+    sand = self.sand.sand
+    return sand[(fi+size)%size,(fj+size)%size] - sand[(bi+size)%size,(bj+size)%size]
+
   def step(self):
 
-    size = self.size
-    xy = self.trail
-    dx = self.sand.dx
+    slope = self._get_slope()
 
-    fi,fj = (size*(xy+dx)).astype('int').flatten()
-    bi,bj = (size*(xy-dx)).astype('int').flatten()
-
-    slope = 0
-    sand = self.sand.sand
-
-    try:
-      slope = sand[fi,fj] - sand[bi,bj]
-    except IndexError:
-      pass
-
-    xy_new = xy+dx
-
-    up_mask = xy_new>=1.0
-    dwn_mask = xy_new<=0.0
-    if dwn_mask.any():
-      xy_new[dwn_mask] += 1
-    if up_mask.any():
-      xy_new[up_mask] %= 1
-
-
-    if (slope>0 and random()<0.7) or (random()<0.2):
+    if (slope>0 and random()<0.7):
+      self.trail = (self.trail+self.sand.dx*40.0+1)%1.0
       self.reselect()
-      return True
-
-    self.trail = xy_new
-    x,y = self.get_ind()
-
-    # TODO: if alive
-    return True
-
+    else:
+      self.trail = (self.trail+self.sand.dx+1)%1.0
 
 class Sand(object):
 
@@ -96,7 +75,8 @@ class Sand(object):
 
     self.stp = self.one
     self.sand = zeros((size,size), 'float')
-    self.sand[200-50:200+50,:] = 20 *INC*random((100,size))
+    # self.sand[200:300,:] = 50. + 20.*INC*random((100,size))
+    self.sand[:,:] = 50. + 20.*INC*random((size,size))
 
     self.grains = []
 
@@ -107,7 +87,7 @@ class Sand(object):
   def spawn(self, n=1):
     xys = random(size=(n,2))
     for xy in xys:
-      self.grains.append(Grain(self, xy.flatten()))
+      self.grains.append(Grain(self, xy))
 
   def get_sand(self):
     return self.s
@@ -128,7 +108,7 @@ class Sand(object):
     return (sand[:,:]-mi)/(ma-mi)
 
   def __set_direction(self):
-    # self.a += (1.0-2.0*random())*self.angle_stp
+    self.a += (1.0-2.0*random())*self.angle_stp
     a = self.a
     self.dx = array([cos(a), sin(a)], 'float')*self.stp
 

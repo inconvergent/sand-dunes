@@ -4,10 +4,10 @@
 from __future__ import print_function
 
 SIZE = 400
-GRAINS = 4000
+GRAINS = 1000
 ONE = 1./SIZE
 
-LEAP = 100
+LEAP = 500
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
