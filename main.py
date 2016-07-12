@@ -3,7 +3,7 @@
 
 
 SIZE = 512
-GRAINS = 100
+GRAINS = 1000
 ONE = 1./SIZE
 
 LEAP = 50000
@@ -19,7 +19,7 @@ def get_initial(img):
   from modules.helpers import get_img_as_rgb_array
 
   initial = get_img_as_rgb_array(img)[:,:,0].squeeze()
-  initial += random(initial.shape)*0.01
+  # initial += random(initial.shape)*0.01
   initial *= 100
 
   gaussian_filter(
@@ -39,8 +39,10 @@ def main():
   from sand import Sand
   from fn import Fn
 
-  initial = get_initial('./img/x512.png')
-  dunes = Dunes(SIZE, initial, grains=GRAINS, angle_stp=0.0, inc=INC)
+  # from numpy import dstack
+
+  initial = get_initial('./img/x512-text.png')
+  dunes = Dunes(SIZE, initial, grains=GRAINS, angle_stp=0.001, inc=INC)
 
   sand = Sand(SIZE)
   sand.set_rgba(FRONT)
@@ -53,6 +55,7 @@ def main():
       if dunes.i % LEAP == 0:
         print(dunes.i)
         bw = dunes.get_normalized_sand(dbg=True)
+        # rgb = dstack((bw,bw,bw))
         sand.set_bg_from_bw_array(bw)
         name = fn.name()
         sand.write_to_png(name)

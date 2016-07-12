@@ -34,7 +34,9 @@ class Dunes(object):
     self.sand[:,:] = initial
     self.xy = random(size=(grains,2))
 
-    self.a = random()*TWOPI
+    self.h = self.one*2
+
+    self.a = pi*0.3
     self.__set_direction()
     self.i = 1
 
@@ -84,15 +86,14 @@ class Dunes(object):
     dx = self.dx
     fij = (((size*(xy+dx))+size)%size).astype('int')
     bij = (((size*(xy-dx))+size)%size).astype('int')
-
-    return sand[fij[:,0],fij[:,1]] - sand[bij[:,0],bij[:,1]]
+    slope = sand[fij[:,0],fij[:,1]] - sand[bij[:,0],bij[:,1]]
+    return slope
 
   def step(self):
     self.i += 1
-
-    # self.__set_direction()
+    self.__set_direction()
     slope = self.__get_slope()
-    mask = slope<0
+    mask = slope<=5
     self.xy[mask,:] = (self.xy[mask,:]+self.dx)%1.0
     self.__reselect(mask)
 
