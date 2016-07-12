@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 from numpy import pi
 from numpy.random import random
 from numpy import cos
@@ -17,7 +15,7 @@ from numpy import logical_and
 TWOPI = pi*2.0
 
 
-class Sand(object):
+class Dunes(object):
 
   def __init__(self, size, grains=10, angle_stp=0.01, inc=1.0):
     self.size = size
@@ -55,7 +53,7 @@ class Sand(object):
     if dbg:
       print(mi, ma)
 
-    return (sand[:,:]-mi)/(ma-mi)
+    return (sand-mi)/(ma-mi)
 
   def __set_direction(self):
     self.a += (1.0-2.0*random())*self.angle_stp

@@ -1,13 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 
 SIZE = 900
 GRAINS = 1000
 ONE = 1./SIZE
 
-LEAP = 500
+LEAP = 5000
 
 INC = 1.0
 
@@ -18,63 +17,33 @@ FRONT = [0,0,0,5]
 
 def main():
 
-  from modules.sand import Sand
-  from matplotlib.pyplot import figure
-  from matplotlib.pyplot import ion
-  from matplotlib.pyplot import clf
-  from matplotlib.pyplot import plot
-  from numpy.random import random
-  from matplotlib.pyplot import draw
-  from matplotlib.pyplot import xlim
-  from matplotlib.pyplot import ylim
-  from matplotlib.pyplot import tight_layout
-  from matplotlib.pyplot import imshow
-  from matplotlib.pyplot import savefig
+  from modules.dunes import Dunes
+  from sand import Sand
+  from fn import Fn
 
 
+  dunes = Dunes(SIZE, grains=GRAINS, angle_stp=0.0, inc=INC)
 
-  sand = Sand(SIZE, grains=GRAINS, angle_stp=0.005, inc=INC)
-
-  figure(0)
-  ion()
-
-
-  img = imshow(
-    random((SIZE,SIZE)),
-    cmap='Greys',
-    interpolation='nearest'
-  )
+  sand = Sand(SIZE)
+  sand.set_rgba(FRONT)
+  fn = Fn(prefix='./res/', postfix='.png')
 
   try:
-    for i in xrange(1000000):
+    for i in range(1000000):
 
-      sand.step()
+      dunes.step()
 
-      if sand.i % LEAP == 0:
-        print(sand.i)
+      if dunes.i % LEAP == 0:
+        print(dunes.i)
+        bw = dunes.get_normalized_sand(dbg=True)
+        sand.set_bg_from_bw_array(bw)
+        name = fn.name()
+        sand.write_to_png(name)
 
-        # clf()
-        vals = sand.get_normalized_sand(dbg=True)
-        img.set_data(vals)
-        # img = imshow(
-          # vals,
-          # cmap='Greys',
-          # interpolation='nearest'
-        # )
-        # for g in sand.get_grains():
-          # x,y = g.get_pos()
-          # plot(y*SIZE, x*SIZE, 'ro')
-
-        xlim([0,SIZE])
-        ylim([0,SIZE])
-        tight_layout()
-        draw()
   except KeyboardInterrupt:
-    savefig('exit.png')
     pass
 
 
 if __name__ == '__main__':
-
-    main()
+  main()
 
