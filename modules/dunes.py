@@ -7,17 +7,21 @@ from numpy import sin
 from numpy import array
 from numpy import zeros
 
-from scipy.ndimage.filters import gaussian_filter
-
 from numpy import logical_not
-from numpy import logical_and
 
 TWOPI = pi*2.0
 
 
 class Dunes(object):
 
-  def __init__(self, size, grains=10, angle_stp=0.01, inc=1.0):
+  def __init__(
+      self,
+      size,
+      initial,
+      grains=10,
+      angle_stp=0.01,
+      inc=1.0
+      ):
     self.size = size
     self.size2 = size*size
     self.one = 1.0/size
@@ -27,15 +31,12 @@ class Dunes(object):
 
     self.stp = self.one
     self.sand = zeros((size,size), 'float')
-    self.sand[:,:] = 50. + 20.*inc*random((size,size))
+    self.sand[:,:] = initial
     self.xy = random(size=(grains,2))
 
     self.a = random()*TWOPI
     self.__set_direction()
     self.i = 1
-
-  def get_xy(self):
-    return self.xy
 
   def get_ind(self):
     return (self.xy*self.size).astype('int')
@@ -87,25 +88,15 @@ class Dunes(object):
     return sand[fij[:,0],fij[:,1]] - sand[bij[:,0],bij[:,1]]
 
   def step(self):
-
     self.i += 1
 
-    self.__set_direction()
-
+    # self.__set_direction()
     slope = self.__get_slope()
-
-    mask = logical_and(slope>0,random(self.grains)<0.7)
-    self.xy[mask,:] = (self.xy[mask,:]+self.dx*50.0+1)%1.0
+    mask = slope<0
+    self.xy[mask,:] = (self.xy[mask,:]+self.dx)%1.0
     self.__reselect(mask)
 
     xmask = logical_not(mask)
-    self.xy[xmask,:] = (self.xy[xmask,:]+self.dx+1)%1.0
+    self.xy[xmask,:] = (self.xy[xmask,:]+self.dx)%1.0
 
-    gaussian_filter(
-      self.sand,
-      0.2,
-      output=self.sand,
-      order=0,
-      mode='mirror'
-      )
 
