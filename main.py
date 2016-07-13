@@ -3,13 +3,16 @@
 
 
 SIZE = 512
-GRAINS = 100
+IMG = './img/x512-text.png'
+GRAINS = 500
 ONE = 1./SIZE
 
 LEAP = 10000
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
+
+ANGLE_STP = 0.01
 
 def get_initial(img):
   from numpy.random import random
@@ -40,8 +43,13 @@ def main():
 
   # from numpy import dstack
 
-  initial = get_initial('./img/x512-text.png')
-  dunes = Dunes(SIZE, initial, grains=GRAINS, angle_stp=0.0)
+  initial = get_initial(IMG)
+  dunes = Dunes(
+      SIZE,
+      initial,
+      grains=GRAINS,
+      angle_stp=ANGLE_STP
+      )
 
   sand = Sand(SIZE)
   sand.set_rgba(FRONT)

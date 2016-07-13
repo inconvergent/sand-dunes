@@ -9,6 +9,7 @@ from numpy import zeros
 
 from numpy import logical_not
 from numpy import logical_or
+from numpy import reshape
 
 TWOPI = pi*2.0
 
@@ -86,7 +87,7 @@ class Dunes(object):
 
   def step(self):
     slope = self._get_slope()
-    stopping = logical_or(slope>2,random(slope.shape)>0.6)
+    stopping = logical_or(slope>=0,random(slope.shape)>0.95)
     continuing = logical_not(stopping)
 
     ij = (self.xy[stopping,:]*self.size).astype('int')
@@ -94,7 +95,9 @@ class Dunes(object):
 
     self._reselsect(stopping)
 
-    self.xy[continuing,:] = (self.xy[continuing,:]+self.dx*2.0)%1.0
+    hh = reshape(slope[continuing], (continuing.sum(), 1))*self.dx
+    self.xy[continuing,:] = (self.xy[continuing,:]+hh)%1.0
+    # self.xy[continuing,:] = (self.xy[continuing,:]+self.dx)%1.0
 
     self._set_direction()
     self.i += 1
