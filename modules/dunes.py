@@ -40,9 +40,6 @@ class Dunes(object):
     self.__set_direction()
     self.i = 1
 
-  def get_ind(self):
-    return (self.xy*self.size).astype('int')
-
   def get_sand(self):
     return self.sand
 
@@ -63,22 +60,6 @@ class Dunes(object):
     a = self.a
     self.dx = array([cos(a), sin(a)], 'float')*self.stp
 
-  def __reselect(self, mask):
-
-    size = self.size
-    ij = self.get_ind()[mask,:]
-
-    self.sand[ij[:,0],ij[:,1]] += self.inc
-
-    reselect_num = mask.sum()
-
-    ## TODO: conservation
-
-    new_xy = random((reselect_num, 2))
-    nij = (size*new_xy).astype('int')
-    self.xy[mask,:] = new_xy
-    self.sand[nij[:,0], nij[:,1]] -= self.inc
-
   def __get_slope(self):
     size = self.size
     sand = self.sand
@@ -91,13 +72,27 @@ class Dunes(object):
 
   def step(self):
     self.i += 1
+    size = self.size
+
     self.__set_direction()
     slope = self.__get_slope()
-    mask = slope<=5
-    self.xy[mask,:] = (self.xy[mask,:]+self.dx)%1.0
-    self.__reselect(mask)
+
+    mask = slope<=0
+    # self.xy[mask,:] = (self.xy[mask,:]+self.dx)%1.0
+
+    ij = (self.xy[mask,:]*self.size).astype('int')
+
+    self.sand[ij[:,0],ij[:,1]] += self.inc
+    reselect_num = mask.sum()
+
+    new_xy = random((reselect_num, 2))
+    nij = (size*new_xy).astype('int')
+    self.xy[mask,:] = new_xy
+    self.sand[nij[:,0], nij[:,1]] -= self.inc
+
+
+
 
     xmask = logical_not(mask)
-    self.xy[xmask,:] = (self.xy[xmask,:]+self.dx)%1.0
-
+    self.xy[xmask,:] = (self.xy[xmask,:]+self.dx*2.0)%1.0
 
