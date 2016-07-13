@@ -69,11 +69,10 @@ class Dunes(object):
   def _reselsect(self, stopping):
     size = self.size
     reselect_num = stopping.sum()
-    count = 0
-    # new_xy = random((reselect_num, 2))
     new_xy = zeros((reselect_num, 2), 'float')
 
     # TODO: vectors!!!!
+    count = 0
     while count<reselect_num:
       nxy = random((1,2))
       ij = (size*nxy).astype('int')
@@ -86,11 +85,8 @@ class Dunes(object):
     self.sand[nij[:,0], nij[:,1]] -= 1
 
   def step(self):
-    self.i += 1
-
     slope = self._get_slope()
-
-    stopping = logical_or(slope<=0,random(slope.shape)>0.9)
+    stopping = logical_or(slope>2,random(slope.shape)>0.6)
     continuing = logical_not(stopping)
 
     ij = (self.xy[stopping,:]*self.size).astype('int')
@@ -98,6 +94,7 @@ class Dunes(object):
 
     self._reselsect(stopping)
 
-    self.xy[continuing,:] = (self.xy[continuing,:]+self.dx)%1.0
+    self.xy[continuing,:] = (self.xy[continuing,:]+self.dx*2.0)%1.0
 
     self._set_direction()
+    self.i += 1
