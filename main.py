@@ -3,10 +3,10 @@
 
 
 SIZE = 512
-GRAINS = 1000
+GRAINS = 10000
 ONE = 1./SIZE
 
-LEAP = 50000
+LEAP = 5000
 
 INC = 1.0
 
@@ -19,12 +19,12 @@ def get_initial(img):
   from modules.helpers import get_img_as_rgb_array
 
   initial = get_img_as_rgb_array(img)[:,:,0].squeeze()
-  # initial += random(initial.shape)*0.01
+  initial += random(initial.shape)*0.01
   initial *= 100
 
   gaussian_filter(
     initial,
-    0.2,
+    0.5,
     output=initial,
     order=0,
     mode='mirror'
@@ -42,7 +42,7 @@ def main():
   # from numpy import dstack
 
   initial = get_initial('./img/x512-text.png')
-  dunes = Dunes(SIZE, initial, grains=GRAINS, angle_stp=0.001, inc=INC)
+  dunes = Dunes(SIZE, initial, grains=GRAINS, angle_stp=0.0, inc=INC)
 
   sand = Sand(SIZE)
   sand.set_rgba(FRONT)

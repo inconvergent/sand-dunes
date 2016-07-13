@@ -8,6 +8,7 @@ from numpy import array
 from numpy import zeros
 
 from numpy import logical_not
+from numpy import logical_or
 
 TWOPI = pi*2.0
 
@@ -77,22 +78,19 @@ class Dunes(object):
     self.__set_direction()
     slope = self.__get_slope()
 
-    mask = slope<=0
-    # self.xy[mask,:] = (self.xy[mask,:]+self.dx)%1.0
+    stopping = logical_or(slope>=0,random(slope.shape)>0.9)
 
-    ij = (self.xy[mask,:]*self.size).astype('int')
+    ij = (self.xy[stopping,:]*self.size).astype('int')
 
     self.sand[ij[:,0],ij[:,1]] += self.inc
-    reselect_num = mask.sum()
+    reselect_num = stopping.sum()
 
     new_xy = random((reselect_num, 2))
     nij = (size*new_xy).astype('int')
-    self.xy[mask,:] = new_xy
+    self.xy[stopping,:] = new_xy
     self.sand[nij[:,0], nij[:,1]] -= self.inc
 
 
-
-
-    xmask = logical_not(mask)
-    self.xy[xmask,:] = (self.xy[xmask,:]+self.dx*2.0)%1.0
+    continuing = logical_not(stopping)
+    self.xy[continuing,:] = (self.xy[continuing,:]+self.dx)%1.0
 
