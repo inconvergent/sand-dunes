@@ -12,7 +12,7 @@ LEAP = 10000
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
 
-ANGLE_STP = 0.01
+ANGLE_STP = 0.001
 
 def get_initial(img):
   from numpy.random import random

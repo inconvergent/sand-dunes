@@ -9,7 +9,9 @@ from numpy import zeros
 
 from numpy import logical_not
 from numpy import logical_or
+from numpy import abs
 from numpy import reshape
+from numpy.linalg import norm
 
 TWOPI = pi*2.0
 
@@ -65,7 +67,7 @@ class Dunes(object):
     fij = (((size*(xy+dx))+size)%size).astype('int')
     bij = (((size*(xy-dx))+size)%size).astype('int')
     slope = sand[fij[:,0],fij[:,1]] - sand[bij[:,0],bij[:,1]]
-    return slope
+    return slope.astype('float')
 
   def _reselsect(self, stopping):
     size = self.size
@@ -87,17 +89,23 @@ class Dunes(object):
 
   def step(self):
     slope = self._get_slope()
-    stopping = logical_or(slope>=0,random(slope.shape)>0.95)
+    # stopping = logical_or(slope>=0,random(slope.shape)>0.95)
+    stopping = slope>0
     continuing = logical_not(stopping)
 
-    ij = (self.xy[stopping,:]*self.size).astype('int')
-    self.sand[ij[:,0],ij[:,1]] += 1
+    ijs = (self.xy[stopping,:]*self.size).astype('int')
+    self.sand[ijs[:,0],ijs[:,1]] += 1
 
     self._reselsect(stopping)
 
-    hh = reshape(slope[continuing], (continuing.sum(), 1))*self.dx
+    # hh = (1.0+reshape(abs(slope[continuing]),
+    #     (continuing.sum(),1)))*self.dx/10.0
+
+    ijc = (self.xy[continuing,:]*self.size).astype('int')
+    hh = self.sand[ijc[:,0], ijc[:,1]].astype('float')
+    hh = reshape(hh, (len(hh),1))/10.0*self.dx
+    # print(norm(hh))
     self.xy[continuing,:] = (self.xy[continuing,:]+hh)%1.0
-    # self.xy[continuing,:] = (self.xy[continuing,:]+self.dx)%1.0
 
     self._set_direction()
     self.i += 1
