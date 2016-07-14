@@ -103,7 +103,7 @@ class Dunes(object):
 
     ijc = (self.xy[continuing,:]*self.size).astype('int')
     hh = self.sand[ijc[:,0], ijc[:,1]].astype('float')
-    hh = reshape(hh, (len(hh),1))/10.0*self.dx
+    hh = reshape(hh, (len(hh),1))/10.0*self.dx*random((len(hh), 1))
     # print(norm(hh))
     self.xy[continuing,:] = (self.xy[continuing,:]+hh)%1.0
 
