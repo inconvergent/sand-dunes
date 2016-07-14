@@ -73,9 +73,11 @@ class Dunes(object):
 
   def _pick(self, x, y):
     self.sand[x,y] -=1
+    self._shadow_row(x)
 
   def _deposit(self, x, y):
     self.sand[x,y] +=1
+    self._shadow_row(x)
 
   def get_normalized_sand(self):
     sand = self.sand.astype('float')

@@ -30,14 +30,14 @@ def get_initial(img):
   initial *= 20
   initial += random(initial.shape)*15
 
-  # from scipy.ndimage.filters import gaussian_filter
-  # gaussian_filter(
-  #   initial,
-  #   2,
-  #   output=initial,
-  #   order=0,
-  #   mode='mirror'
-  #   )
+  from scipy.ndimage.filters import gaussian_filter
+  gaussian_filter(
+    initial,
+    2,
+    output=initial,
+    order=0,
+    mode='mirror'
+    )
 
   return initial.astype('int')
 
