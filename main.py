@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from numpy import zeros
+from numpy import ones
 from numpy import dstack
 
 
 SIZE = 512
-IMG = './img/x512.png'
+IMG = './img/x512-text.png'
 ONE = 1./SIZE
 
-LEAP = 10000
+LEAP = 50000
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
@@ -18,10 +19,10 @@ FRONT = [0,0,0,5]
 def get_initial(img):
   from numpy.random import random
 
-  initial = zeros((SIZE,SIZE), 'float')
-  # from modules.helpers import get_img_as_rgb_array
-  # initial = get_img_as_rgb_array(img)[:,:,0].squeeze()
-  # initial *= 20
+  # initial = zeros((SIZE,SIZE), 'float')
+  from modules.helpers import get_img_as_rgb_array
+  initial = get_img_as_rgb_array(img)[:,:,0].squeeze()
+  initial *= 20
   initial += random(initial.shape)*15
 
   from scipy.ndimage.filters import gaussian_filter
@@ -66,11 +67,11 @@ def main():
 
       dunes.steps(steps=LEAP)
       print(dunes.i)
-      bw = dunes.get_normalized_sand()
+      bw = dunes.get_normalized_sand()*0.8
       # rgb = dstack((bw,bw,bw))
       # sand.set_bg_from_bw_array(bw)
       shadow = dunes.get_shadow()
-      rgb = dstack((zeros(bw.shape,'float'),bw,1.0-shadow))
+      rgb = dstack((bw,bw,bw+0.1*(1.0-shadow)))
       sand.set_bg_from_rgb_array(rgb)
       name = fn.name()
       sand.write_to_png(name)

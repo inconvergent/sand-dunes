@@ -55,22 +55,24 @@ class Dunes(object):
     p = 0
     h = height[p]
 
+    done = False
     while True:
-      # TODO: handle continuous boundary
       long_shadow = True
       for d in range(1,delta+1):
         pd = p+d
-        hd = height[pd]
+        hd = height[pd%size]
         if hd>=h:
           h = hd
           long_shadow = False
+          if pd>=size:
+            done=True
           break
-        shadow[i, pd] = True
+        shadow[i, pd%size] = True
 
       p = pd
       if long_shadow:
         h = h-1 if h-1>0 else 0
-      if p>=size-delta:
+      if p>=size and done:
         break
 
   def _cascade(self, i, j):
