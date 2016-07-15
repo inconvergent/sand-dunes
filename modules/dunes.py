@@ -3,6 +3,7 @@
 from numpy import pi
 from numpy.random import random
 from numpy.random import randint
+from numpy.random import shuffle
 from numpy import cos
 from numpy import sin
 from numpy import array
@@ -48,12 +49,14 @@ class Dunes(object):
     height = self.sand[i, :]
     size = self.size
     shadow = self.shadow
+    shadow[i,:] = False
     delta = self.delta
 
     p = 0
     h = height[p]
 
     while True:
+      # TODO: handle continuous boundary
       long_shadow = True
       for d in range(1,delta+1):
         pd = p+d
@@ -61,7 +64,6 @@ class Dunes(object):
         if hd>=h:
           h = hd
           long_shadow = False
-          # print(i,p,h,hd,'break')
           break
         shadow[i, pd] = True
 
@@ -71,13 +73,41 @@ class Dunes(object):
       if p>=size-delta:
         break
 
-  def _pick(self, x, y):
-    self.sand[x,y] -=1
-    self._shadow_row(x)
+  def _cascade(self, i, j):
+    height = self.sand[i,j]
+    sand = self.sand
+    size = self.size
+    order = [0,1,2,3]
+    shuffle(order)
+    directions = (array([
+      [i,j-1],
+      [i,j+1],
+      [i-1,j],
+      [i+1,j],
+      ], 'int')%size)[order,:]
 
-  def _deposit(self, x, y):
-    self.sand[x,y] +=1
-    self._shadow_row(x)
+    for d in directions:
+      df = height-sand[d[0], d[1]]
+      if abs(df)>2:
+        if df<0:
+          sand[d[0],d[1]]-=1
+          sand[i,j] += 1
+        else:
+          sand[d[0],d[1]]+=1
+          sand[i,j] -= 1
+        return d[1]
+    return None
+
+  def _erode(self, i, j, additive=False):
+    if additive:
+      self.sand[i,j] +=1
+    else:
+      self.sand[i,j] -=1
+
+    r = self._cascade(i, j)
+    if r is not None and r is not i:
+      self._shadow_row(r)
+    self._shadow_row(i)
 
   def get_normalized_sand(self):
     sand = self.sand.astype('float')
@@ -96,12 +126,12 @@ class Dunes(object):
     sand = self.sand
     shadow = self.shadow
     while True:
-      x,y = randint(size, size=2)
-      if sand[x,y]<1:
+      i,j = randint(size, size=2)
+      if sand[i,j]<1:
         continue
-      if shadow[x,y]:
+      if shadow[i,j]:
         continue
-      return x,y
+      return i,j
 
   def steps(self, steps=1000):
     size = self.size
@@ -109,12 +139,12 @@ class Dunes(object):
 
     for _ in range(steps):
       self.i += 1
-      x,y = self._random_select()
+      i,j = self._random_select()
 
-      self._pick(x, y)
+      self._erode(i, j, additive=False)
       while True:
-        y = (y+1)%size
-        if shadow[x,y] or random()<0.5:
-          self._deposit(x,y)
+        j = (j+1)%size
+        if shadow[i,j] or random()<0.24:
+          self._erode(i,j,additive=True)
           break
 
