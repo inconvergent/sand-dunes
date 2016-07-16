@@ -5,8 +5,8 @@ from numpy import zeros
 from numpy import dstack
 
 
-SIZE = 1500
-IMG = './img/x512-text.png'
+SIZE = 1000
+IMG = './img/gen.png'
 ONE = 1./SIZE
 
 LEAP = 50000
@@ -17,17 +17,10 @@ DELTA = 10
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
 
-
-def get_initial(img):
-  from numpy.random import random
-
-  initial = zeros((SIZE,SIZE), 'float')
-  # from modules.helpers import get_img_as_rgb_array
-  # initial = get_img_as_rgb_array(img)[:,:,0].squeeze()
-  # initial *= 20
-  initial += random(initial.shape)*15
-
+def get_initial_rnd():
   from scipy.ndimage.filters import gaussian_filter
+  from numpy.random import random
+  initial = random((SIZE,SIZE))*15
   gaussian_filter(
     initial,
     2,
@@ -35,6 +28,14 @@ def get_initial(img):
     order=0,
     mode='mirror'
     )
+
+  return initial.astype('int')
+
+def get_initial(img):
+  from modules.helpers import get_img_as_rgb_array
+
+  initial = 1.0 - get_img_as_rgb_array(img)[:,:,0].squeeze()
+  initial *= 20
 
   return initial.astype('int')
 
@@ -56,6 +57,7 @@ def main():
   from time import time
 
   initial = get_initial(IMG)
+  # initial = get_initial_rnd()
   bw = zeros(initial.shape,'float')
   shadow = zeros(initial.shape,'float')
 
