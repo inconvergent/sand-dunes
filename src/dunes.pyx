@@ -128,6 +128,8 @@ cdef class Dunes:
   @cython.boundscheck(False)
   @cython.nonecheck(False)
   cdef void _random_select(self, int* ij) nogil:
+    cdef int i
+    cdef int j
     while True:
       i = _randint(self.size)
       j = _randint(self.size)
