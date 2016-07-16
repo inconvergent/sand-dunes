@@ -25,6 +25,11 @@ extensions = [
       sources = ['./src/dunes.pyx'],
       extra_compile_args = _extra,
       include_dirs = [numpy.get_include()]
+      ),
+    Extension('pillars',
+      sources = ['./src/pillars.pyx'],
+      extra_compile_args = _extra,
+      include_dirs = [numpy.get_include()]
       )
     ]
 
