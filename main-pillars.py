@@ -12,6 +12,7 @@ LEAP = 50000
 PROB = 0.3
 
 DELTA = 10
+PILLAR_LEAP = 1000
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
@@ -26,14 +27,13 @@ def main():
   from time import time
 
 
-  from modules.helpers import get_initial
-  initial = get_initial(IMG)
+  from modules.helpers import get_img_as_rgb_array
+  color = get_img_as_rgb_array(IMG)
+  height = zeros(color.shape,'int')
+  height[:,:] = 10
+  bw = zeros(color.shape,'float')
 
-  # from modules.helpers import get_initial_rnd
-  # initial = get_initial_rnd()
-  bw = zeros(initial.shape,'float')
-
-  dunes = Pillars(initial, DELTA, PROB)
+  dunes = Pillars(color, height, DELTA, PROB, PILLAR_LEAP)
 
   sand = Sand(SIZE)
   sand.set_rgba(FRONT)

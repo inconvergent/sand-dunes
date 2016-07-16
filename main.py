@@ -4,7 +4,7 @@
 from numpy import zeros
 
 
-SIZE = 1000
+SIZE = 512
 IMG = './img/gen.png'
 ONE = 1./SIZE
 
@@ -26,11 +26,11 @@ def main():
   from time import time
 
 
-  from modules.helpers import get_initial
-  initial = get_initial(IMG)
+  # from modules.helpers import get_initial
+  # initial = get_initial(IMG)
 
-  # from modules.helpers import get_initial_rnd
-  # initial = get_initial_rnd()
+  from modules.helpers import get_initial_rnd
+  initial = get_initial_rnd(SIZE, n=2)
   bw = zeros(initial.shape,'float')
 
   dunes = Dunes(initial, DELTA, PROB)
@@ -44,7 +44,7 @@ def main():
       t0 = time()
       itt = dunes.steps(LEAP)
       print(itt, time()-t0)
-      dunes.get_normalized_sand(bw)
+      dunes.get_normalized_sand_limit(bw, 10)
       # bw *= 0.8
       # sand.set_bg_from_bw_array(bw)
       # dunes.get_shadow(shadow)

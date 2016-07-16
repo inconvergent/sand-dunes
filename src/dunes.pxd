@@ -25,6 +25,7 @@ cdef class Dunes:
   cdef int _cascade(self, int i, int j) nogil
 
   cpdef void get_normalized_sand(self, double[:,:])
+  cpdef void get_normalized_sand_limit(self, double[:,:], long)
   cpdef void get_shadow(self, double[:,:])
 
   cpdef int steps(self, int steps)

@@ -18,22 +18,6 @@ cdef inline double _random() nogil:
 cdef inline int _randint(int a) nogil:
   return rand()%a
 
-# @cython.wraparound(False)
-# @cython.boundscheck(False)
-# @cython.nonecheck(False)
-# cdef inline double _min(double a, double b) nogil:
-#   if a<b:
-#     return a
-#   return b
-#
-# @cython.wraparound(False)
-# @cython.boundscheck(False)
-# @cython.nonecheck(False)
-# cdef inline double _max(double a, double b) nogil:
-#   if a>b:
-#     return a
-#   return b
-
 @cython.wraparound(False)
 @cython.boundscheck(False)
 @cython.nonecheck(False)

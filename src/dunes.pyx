@@ -149,19 +149,37 @@ cdef class Dunes:
     cdef int i
     cdef int j
     cdef long ma = self.sand[0,0]
-    cdef long mi = self.sand[0,0]
     cdef double nrm = 0.0
 
     with nogil:
       for i in range(self.size):
         for j in range(self.size):
           ma = _max(ma, self.sand[i,j])
-          mi = _min(mi, self.sand[i,j])
 
-      nrm = <double>(ma-mi)
+      nrm = <double>(ma)
       for i in range(self.size):
         for j in range(self.size):
-          out[i,j] = <double>(self.sand[i,j]-mi)/nrm
+          out[i,j] = <double>(self.sand[i,j])/nrm
+    return
+
+  @cython.cdivision(True)
+  @cython.wraparound(False)
+  @cython.boundscheck(False)
+  @cython.nonecheck(False)
+  cpdef void get_normalized_sand_limit(self, double[:,:] out, long limit):
+    cdef int i
+    cdef int j
+    cdef long ma = self.sand[0,0]
+    cdef double nrm = 0.0
+
+    with nogil:
+      nrm = <double>(limit)
+      for i in range(self.size):
+        for j in range(self.size):
+          if self.sand[i,j]>limit:
+            out[i,j] = 1.0
+          else:
+            out[i,j] = <double>(self.sand[i,j])/nrm
     return
 
   @cython.cdivision(True)

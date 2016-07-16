@@ -3,21 +3,22 @@
 
 cimport cython
 
-# from libcpp cimport bool
 
-# import numpy as np
-# cimport numpy as np
-
-
-cdef class Dunes:
+cdef class Pillars:
 
   cdef int size
   cdef int delta
   cdef double prob
+  cdef int pillar_leap
   cdef int i
-  cdef long[:,:] sand
+
+  cdef long[:,:,:] pillar
+  cdef double[:,:,:] color
+  cdef long[:,:] height
+
   cdef long[:,:] shadow
 
+  cdef void _init_pillar_map(self) nogil
   cdef void _init_shadow_map(self) nogil
   cdef void _shadow_row(self, const int i) nogil
   cdef void _random_select(self, int* ij) nogil

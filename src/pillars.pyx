@@ -17,26 +17,45 @@ import numpy as np
 cimport numpy as np
 
 
-cdef class Dunes:
+cdef class Pillars:
 
   def __init__(
       self,
-      long[:,:] initial,
+      double[:,:,:] color,
+      long[:,:] height,
       int delta,
-      double prob
+      double prob,
+      int pillar_leap
       ):
     cdef int size = len(initial)
     #
     self.size = size
     self.delta = delta
     self.prob = prob
+    self.pillar_leap = pillar_leap
     self.i = 0
 
-    self.sand = np.zeros((size,size), 'int')
-    self.sand[:,:] = initial
-    self.shadow = np.zeros((size,size), 'int')
+    self.pillar = np.zeros((size,size,pillar_leap), 'int')
+    self.height[:,:] = height
+    self.color[:,:] = color
 
+    self.shadow = np.zeros((size,size), 'int')
     self._init_shadow_map()
+    self._init_pillar_map()
+    return
+
+  @cython.wraparound(False)
+  @cython.boundscheck(False)
+  @cython.nonecheck(False)
+  cdef void _init_pillar_map(self) nogil:
+    cdef int i
+    cdef int j
+    cdef int k
+    for i in range(self.size):
+      for j in range(self.size):
+        for k in range(self.height[i,j]):
+          self.pillar[i,j,k] = i*s+j
+    return
 
   @cython.wraparound(False)
   @cython.boundscheck(False)
@@ -45,6 +64,7 @@ cdef class Dunes:
     cdef int i
     for i in range(self.size):
       self._shadow_row(i)
+    return
 
   @cython.wraparound(False)
   @cython.boundscheck(False)
