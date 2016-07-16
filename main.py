@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from numpy import zeros
-from numpy import dstack
 
 
 SIZE = 1000
@@ -17,36 +16,6 @@ DELTA = 10
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
 
-def get_initial_rnd():
-  from scipy.ndimage.filters import gaussian_filter
-  from numpy.random import random
-  initial = random((SIZE,SIZE))*15
-  gaussian_filter(
-    initial,
-    2,
-    output=initial,
-    order=0,
-    mode='mirror'
-    )
-
-  return initial.astype('int')
-
-def get_initial(img):
-  from modules.helpers import get_img_as_rgb_array
-
-  initial = 1.0 - get_img_as_rgb_array(img)[:,:,0].squeeze()
-  initial *= 20
-
-  return initial.astype('int')
-
-def save_shadow_map(dunes, sand):
-  bw = zeros((SIZE,SIZE),'float')
-  shadow = zeros((SIZE,SIZE),'float')
-  dunes.get_normalized_sand(bw)
-  dunes.get_shadow(shadow)
-  rgb = dstack((zeros(bw.shape,'float'),bw,1.0-shadow))
-  sand.set_bg_from_rgb_array(rgb)
-  sand.write_to_png('shadow.png')
 
 
 def main():
@@ -56,10 +25,13 @@ def main():
   from fn import Fn
   from time import time
 
+
+  from modules.helpers import get_initial
   initial = get_initial(IMG)
+
+  # from modules.helpers import get_initial_rnd
   # initial = get_initial_rnd()
   bw = zeros(initial.shape,'float')
-  shadow = zeros(initial.shape,'float')
 
   dunes = Dunes(initial, DELTA, PROB)
 
@@ -69,7 +41,6 @@ def main():
 
   try:
     while True:
-
       t0 = time()
       itt = dunes.steps(LEAP)
       print(itt, time()-t0)
@@ -85,7 +56,7 @@ def main():
 
   except KeyboardInterrupt:
     pass
-  #
+
 
 if __name__ == '__main__':
   main()
