@@ -90,9 +90,9 @@ cdef class Dunes:
     #TODO: shuffle
     cdef long height = self.sand[i,j]
     cdef int* directions = [
-        i,(j-1)%self.size,
+        # i,(self.size+j-1)%self.size,
         i,(j+1)%self.size,
-        (i-1)%self.size,j,
+        (self.size+i-1)%self.size,j,
         (i+1)%self.size,j
         ]
 
@@ -100,7 +100,7 @@ cdef class Dunes:
     cdef int a
     cdef int b
     cdef long df
-    for d in range(4):
+    for d in range(3):
       a = directions[2*d]
       b = directions[2*d+1]
       df = height-self.sand[a,b]

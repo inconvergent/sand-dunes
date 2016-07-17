@@ -41,12 +41,6 @@ def get_initial_rnd(size, n=15):
     )
   return initial.astype('int')
 
-def get_initial(img, n=15):
-  from modules.helpers import get_img_as_rgb_array
-  initial = get_img_as_rgb_array(img)[:,:,0].squeeze()
-  initial *= n
-  return initial.astype('int')
-
 def save_shadow_map(size, dunes, sand, fn='shadow.png'):
   from numpy import zeros
   from numpy import dstack

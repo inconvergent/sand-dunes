@@ -5,13 +5,12 @@ from numpy import zeros
 
 
 SIZE = 512
-IMG = './img/gen.png'
 ONE = 1./SIZE
 
-LEAP = 50000
-PROB = 0.3
+LEAP = 100000
+PROB = 0.5
 
-DELTA = 10
+DELTA = 20
 
 BACK = [1,1,1,1]
 FRONT = [0,0,0,5]
@@ -19,18 +18,13 @@ FRONT = [0,0,0,5]
 
 
 def main():
-
   from dunes import Dunes
   from sand import Sand
   from fn import Fn
   from time import time
 
-
-  # from modules.helpers import get_initial
-  # initial = get_initial(IMG)
-
   from modules.helpers import get_initial_rnd
-  initial = get_initial_rnd(SIZE, n=2)
+  initial = get_initial_rnd(SIZE, n=4)
   bw = zeros(initial.shape,'float')
 
   dunes = Dunes(initial, DELTA, PROB)
@@ -53,7 +47,6 @@ def main():
       sand.set_bg_from_bw_array(bw)
       name = fn.name()
       sand.write_to_png(name)
-
   except KeyboardInterrupt:
     pass
 
